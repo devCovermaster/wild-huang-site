@@ -115,8 +115,8 @@ defineExpose({
 
 .video-player-container {
   position: relative;
-  width: 80%;
-  max-width: 1000px;
+  width: min(90vw, calc(85vh * 9 / 16));
+  height: min(85vh, calc(90vw * 16 / 9));
   background-color: #000;
   border-radius: 8px;
   overflow: hidden;
@@ -125,9 +125,10 @@ defineExpose({
 
 .video-element {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   outline: none;
+  object-fit: contain;
 }
 
 .close-btn {
@@ -167,7 +168,8 @@ defineExpose({
 /* 响应式设计 */
 @media (max-width: 768px) {
   .video-player-container {
-    width: 95%;
+    width: min(92vw, calc(85vh * 9 / 16));
+    height: min(85vh, calc(92vw * 16 / 9));
   }
   
   .close-btn {

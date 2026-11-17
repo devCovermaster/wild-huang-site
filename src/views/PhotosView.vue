@@ -1,389 +1,235 @@
 <template>
-  <div class="app">
-    <!-- 示例1: 直接传入图片数组 -->
-    <ImageGallery
-      v-if="mode === 'array'"
-      :images="staticImages"
-      title="精选图片集"
-      :show-likes="true"
-      @like="handleLike"
-      @download="handleDownload"
-    >
-      <template #actions>
-        <button class="switch-btn" @click="mode = 'pagination'">
-          切换到分页模式
-        </button>
-      </template>
-    </ImageGallery>
+  <main class="photos-page">
+    <!-- 顶部极简杂志感导言区 -->
+    <section class="archive-hero">
+      <div class="archive-hero-inner">
+        <div class="archive-title-group">
+          <p class="archive-eyebrow">VISUAL ARCHIVE · 99 SELECTED FRAMES</p>
+          <h1 class="archive-title">Frames in the Wild</h1>
+        </div>
+        <p class="archive-subtitle">
+          荒野、公路与车内慢生活——记录在途的每一瞬光影与自由。点击任意画幅进入沉浸视图，支持键盘方向键切换与细节缩放。
+        </p>
+      </div>
+    </section>
 
-    <!-- 示例2: 使用分页接口 -->
-    <ImageGallery
-      v-else
-      :pagination="paginationConfig"
-      title="无限滚动图片流"
-      :show-likes="true"
-      @like="handleLike"
-      @download="handleDownload"
-    >
-      <template #actions>
-        <button class="switch-btn" @click="mode = 'array'">
-          切换到数组模式
-        </button>
-      </template>
-    </ImageGallery>
-  </div>
+    <!-- 瀑布流画廊组件 -->
+    <ImageGallery :images="galleryImages" :column-count="3" :gap="22" />
+  </main>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import ImageGallery, { type ImageItem, type PaginationConfig } from '@/components/PhotoList.vue'
+import ImageGallery, { type ImageItem } from '@/components/PhotoList.vue'
 
-const mode = ref<'array' | 'pagination'>('array')
-
-// 示例1: 静态图片数组
-const staticImages2 = ref<ImageItem[]>([
-  {
-    id: 1,
-    url: 'https://images.unsplash.com/photo-1760594386925-519fba2ad5ba?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzMjN8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '山脉风景',
-    author: 'John Doe',
-    authorAvatar: 'https://i.pravatar.cc/150?img=1',
-    likes: 1234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 2,
-    url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800',
-    alt: '自然风光',
-    author: 'Jane Smith',
-    authorAvatar: 'https://i.pravatar.cc/150?img=2',
-    likes: 5678,
-    width: 800,
-    height: 600
-  },
-  {
-    id: 3,
-    url: 'https://plus.unsplash.com/premium_photo-1760445178715-6b473a4ba42b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzMzh8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '森林小径',
-    author: 'Bob Wilson',
-    authorAvatar: 'https://i.pravatar.cc/150?img=3',
-    likes: 890,
-    width: 800,
-    height: 1000
-  },
-  {
-    id: 4,
-    url: 'https://images.unsplash.com/photo-1760715658357-57df8f045b8e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw5fHx8ZW58MHx8fHx8&auto=format&fit=crop&q=60&w=900',
-    alt: '湖泊倒影',
-    author: 'Alice Brown',
-    authorAvatar: 'https://i.pravatar.cc/150?img=4',
-    likes: 2345,
-    width: 800,
-    height: 533
-  },
-  {
-    id: 5,
-    url: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800',
-    alt: '山顶日出',
-    author: 'Charlie Davis',
-    authorAvatar: 'https://i.pravatar.cc/150?img=5',
-    likes: 3456,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 6,
-    url: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800',
-    alt: '海滨日落',
-    author: 'Eva Martinez',
-    authorAvatar: 'https://i.pravatar.cc/150?img=6',
-    likes: 4567,
-    width: 800,
-    height: 600
-  },
-  {
-    id: 7,
-    url: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=800',
-    alt: '雪山景观',
-    author: 'Frank Lee',
-    authorAvatar: 'https://i.pravatar.cc/150?img=7',
-    likes: 1890,
-    width: 800,
-    height: 900
-  },
-  {
-    id: 8,
-    url: 'https://images.unsplash.com/photo-1747447597297-0716bbd5b049?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw0MHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '花田美景',
-    author: 'Grace Kim',
-    authorAvatar: 'https://i.pravatar.cc/150?img=8',
-    likes: 2789,
-    width: 800,
-    height: 533
-  },
-  {
-    id: 9,
-    url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 10,
-    url: 'https://images.unsplash.com/photo-1760985813018-b6b951c57fe8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw5NXx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '海滨日落',
-    author: 'Eva Martinez',
-    authorAvatar: 'https://i.pravatar.cc/150?img=6',
-    likes: 4567,
-    width: 800,
-    height: 600
-  },
-  {
-    id: 11,
-    url: 'https://images.unsplash.com/photo-1760286159549-4413b0063baf?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwyNjF8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '花田美景',
-    author: 'Grace Kim',
-    authorAvatar: 'https://i.pravatar.cc/150?img=8',
-    likes: 2789,
-    width: 800,
-    height: 533
-  },
-  {
-    id: 12,
-    url: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=800',
-    alt: '雪山景观',
-    author: 'Frank Lee',
-    authorAvatar: 'https://i.pravatar.cc/150?img=7',
-    likes: 1890,
-    width: 800,
-    height: 900
-  },
-  {
-    id: 13,
-    url: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 14,
-    url: 'https://images.unsplash.com/photo-1760594387039-8db5aa19c06a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzNDV8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 15,
-    url: 'https://plus.unsplash.com/premium_photo-1698406096055-91a364147db5?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHwzNjZ8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 16,
-    url: 'https://plus.unsplash.com/premium_photo-1760269682838-4f7a3d586ad3?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw0NTh8fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 17,
-    url: 'https://images.unsplash.com/photo-1757106322111-fd92ecd4a0a2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=985',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 18,
-    url: 'https://images.unsplash.com/photo-1760883956955-31d8adb4e6d9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDEwfDZzTVZqVExTa2VRfHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 19,
-    url: 'https://plus.unsplash.com/premium_photo-1760289959686-f000a437f39c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDQwfDZzTVZqVExTa2VRfHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-  {
-    id: 20,
-    url: 'https://images.unsplash.com/photo-1760972067614-ddc10b94863f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDM3fDZzTVZqVExTa2VRfHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900',
-    alt: '城市夜景',
-    author: 'Henry Zhang',
-    authorAvatar: 'https://i.pravatar.cc/150?img=9',
-    likes: 5234,
-    width: 800,
-    height: 1200
-  },
-])
-
-interface ImageItem {
-  id: number
-  url: string
-  width: number
-  height: number
-}
-
-interface Position {
-  left: number
-  top: number
+// 99 张摄影作品的真实像素尺寸表 [width, height]，确保首屏零抖动精确瀑布流排版
+const IMAGE_DIMENSIONS: Record<number, [number, number]> = {
+  1: [2592, 3888],
+  2: [3840, 2159],
+  3: [3840, 2159],
+  4: [1737, 977],
+  5: [6000, 4000],
+  6: [6000, 4000],
+  7: [4032, 3024],
+  8: [6000, 4000],
+  9: [6840, 4560],
+  10: [4240, 2832],
+  11: [4240, 2832],
+  12: [1616, 1080],
+  13: [4240, 2832],
+  14: [4240, 2832],
+  15: [4240, 2832],
+  16: [4240, 2832],
+  17: [4240, 2832],
+  18: [4240, 2832],
+  19: [4240, 2832],
+  20: [4240, 2832],
+  21: [4240, 2832],
+  22: [4240, 2832],
+  23: [6000, 4000],
+  24: [4240, 2832],
+  25: [4240, 2832],
+  26: [4240, 2832],
+  27: [4240, 2832],
+  28: [4240, 2832],
+  29: [4240, 2832],
+  30: [4240, 2832],
+  31: [4240, 2832],
+  32: [4240, 2832],
+  33: [4240, 2832],
+  34: [6000, 4000],
+  35: [4240, 2832],
+  36: [4240, 2832],
+  37: [4240, 2832],
+  38: [4240, 2832],
+  39: [4240, 2832],
+  40: [4240, 2832],
+  41: [4240, 2832],
+  42: [4240, 2832],
+  43: [4240, 2832],
+  44: [4240, 2832],
+  45: [3981, 1836],
+  46: [3120, 2080],
+  47: [3120, 2080],
+  48: [1620, 1080],
+  49: [2400, 1600],
+  50: [2400, 1600],
+  51: [1920, 1080],
+  52: [1080, 949],
+  53: [1080, 948],
+  54: [1679, 1216],
+  55: [5130, 6840],
+  56: [4240, 2832],
+  57: [6840, 4560],
+  58: [4000, 6000],
+  59: [6000, 4000],
+  60: [3840, 2159],
+  61: [3840, 2159],
+  62: [1620, 1080],
+  63: [6000, 4000],
+  64: [6000, 4000],
+  65: [6000, 4000],
+  66: [1280, 1707],
+  67: [4240, 2832],
+  68: [1737, 977],
+  69: [1920, 2560],
+  70: [1280, 1920],
+  71: [1280, 1920],
+  72: [4000, 6000],
+  73: [4000, 6000],
+  74: [6000, 4000],
+  75: [6000, 4000],
+  76: [6000, 4000],
+  77: [4032, 3024],
+  78: [4240, 2832],
+  79: [4240, 2832],
+  80: [4032, 3024],
+  81: [3024, 4032],
+  82: [3024, 4032],
+  83: [2070, 1080],
+  84: [4032, 3024],
+  85: [3024, 4032],
+  86: [1620, 1080],
+  87: [6000, 4000],
+  88: [6000, 4000],
+  89: [4240, 2832],
+  90: [4032, 3024],
+  91: [4032, 3024],
+  92: [3024, 4032],
+  93: [5472, 3648],
+  94: [8262, 11019],
+  95: [3024, 4033],
+  96: [4032, 3024],
+  97: [4028, 2965],
+  98: [4032, 3024],
+  99: [4032, 3024]
 }
 
 const getDocImage = (name: number): string => {
   return new URL(`/src/assets/imgs/${name}.jpg`, import.meta.url).href
 }
 
-// 生成模拟图片数据（使用 Unsplash）
-const generateMockImages = (count: number): ImageItem[] => {
-  const images: ImageItem[] = []
-  // const topics = ['nature', 'architecture', 'food', 'travel', 'animals', 'fashion', 'art', 'technology']
+// 将竖幅、宽画幅与标准横幅作品均匀穿插编排，赋予首屏极具呼吸感的错落瀑布流节奏
+const buildCuratedGallery = (total: number): ImageItem[] => {
+  const portraits: ImageItem[] = []
+  const landscapes: ImageItem[] = []
 
-  for (let i = 1; i <= count; i++) {
-    // const topic = topics[Math.floor(Math.random() * topics.length)]
-    const height = 200 + Math.floor(Math.random() * 300)
-    images.push({
+  for (let i = 1; i <= total; i++) {
+    const [width, height] = IMAGE_DIMENSIONS[i] || [4240, 2832]
+    const item: ImageItem = {
       id: i,
       url: getDocImage(i),
-      // url: `https://emvwaah4t3bbsgp0.public.blob.vercel-storage.com/imgs/${i}.jpg`,
-      width: 300,
-      height: height
-    })
-  }
-  return images
-}
-
-const staticImages = ref<ImageItem[]>(generateMockImages(99))
-
-function getRandomInt(min, max) {
-    let lastNumber; // 用于存储上一个随机数
-    let randomNumber; // 用于存储当前随机数
-
-    // 生成一个初始的随机数，但不检查是否与前一个相邻
-    randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-    lastNumber = randomNumber; // 初始化上一个随机数为当前随机数
-
-    // 检查并确保生成的随机数与前一个随机数不相邻
-    while (Math.abs(randomNumber - lastNumber) === 1) {
-        randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+      alt: `Wild Huang Photography #${i}`,
+      width,
+      height
     }
-
-    // 更新上一个随机数为当前随机数，以便下一次使用
-    lastNumber = randomNumber;
-
-    return randomNumber;
-}
-
-// 示例2: 模拟分页接口
-const mockImageDatabase: ImageItem[] = Array.from({ length: 100 }, (_, i) => {
-  const imageTopics = [
-    'nature', 'mountain', 'ocean', 'forest', 'sunset', 'city', 
-    'landscape', 'sky', 'water', 'architecture'
-  ]
-  const topic = imageTopics[i % imageTopics.length]
-  const randomHeight = Math.floor(Math.random() * 400) + 600
-
-  const img = staticImages.value[getRandomInt(0, 19)]
-  // console.log(3333, img.height, randomHeight)
-  
-  return {
-    id: `img-${i + 1}`,
-    // url: `https://source.unsplash.com/800x${randomHeight}/?${topic}&sig=${i}`,
-    url: img.url,
-    alt: `${topic} ${i + 1}`,
-    author: `摄影师 ${String.fromCharCode(65 + (i % 26))}`,
-    authorAvatar: `https://images.unsplash.com/photo-1757489952588-e05db1d85c28?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=40&dpr=2&h=40`,
-    likes: Math.floor(Math.random() * 10000),
-    width: 800,
-    // height: img.height
-    height: randomHeight
-  }
-})
-
-const paginationConfig: PaginationConfig = {
-  fetchFunction: async (page: number, pageSize: number) => {
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 800))
-    
-    const start = (page - 1) * pageSize
-    const end = start + pageSize
-    const data = mockImageDatabase.slice(start, end)
-    
-    return {
-      data,
-      hasMore: end < mockImageDatabase.length
+    if (height > width) {
+      portraits.push(item)
+    } else {
+      landscapes.push(item)
     }
-  },
-  pageSize: 15
+  }
+
+  // 每隔约 5 张横图穿插 1 张竖图，形成自然的视觉高低差
+  const curated: ImageItem[] = []
+  let pIdx = 0
+  landscapes.forEach((img, index) => {
+    curated.push(img)
+    if (index % 5 === 1 && pIdx < portraits.length) {
+      const pItem = portraits[pIdx++]
+      if (pItem) curated.push(pItem)
+    }
+  })
+
+  while (pIdx < portraits.length) {
+    const pItem = portraits[pIdx++]
+    if (pItem) curated.push(pItem)
+  }
+
+  return curated
 }
 
-// 事件处理
-const handleLike = (image: ImageItem) => {
-  console.log('点赞图片:', image)
-  // 这里可以调用 API 进行点赞操作
-}
-
-const handleDownload = (image: ImageItem) => {
-  console.log('下载图片:', image)
-  // 这里可以实现图片下载逻辑
-  const link = document.createElement('a')
-  link.href = image.url
-  link.download = `image-${image.id}.jpg`
-  link.click()
-}
+const galleryImages = ref<ImageItem[]>(buildCuratedGallery(99))
 </script>
 
 <style scoped>
-.app {
+.photos-page {
   min-height: 100vh;
-  background: #ffffff;
+  background: #fafafa;
 }
 
-.switch-btn {
-  padding: 0.625rem 1.25rem;
-  background: #111;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.875rem;
+.archive-hero {
+  background: #fafafa;
+  padding: 56px 40px 28px;
+}
+
+.archive-hero-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.archive-eyebrow {
+  font-size: 11px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  letter-spacing: 2.5px;
+  color: #888;
+  margin-bottom: 10px;
+  text-transform: uppercase;
 }
 
-.switch-btn:hover {
-  background: #000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.archive-title {
+  font-size: 2.75rem;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: #111;
+  line-height: 1.15;
+  margin: 0;
 }
 
-.switch-btn:active {
-  transform: translateY(0);
+.archive-subtitle {
+  max-width: 440px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: #666;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .archive-hero {
+    padding: 32px 16px 18px;
+  }
+
+  .archive-title {
+    font-size: 2rem;
+  }
+
+  .archive-hero-inner {
+    gap: 14px;
+  }
 }
 </style>

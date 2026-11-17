@@ -25,16 +25,35 @@ header {
     left: 0;
     right: 0;
     z-index: 1000;
-    padding: 20px 40px;
+    height: 58px;
+    padding: 0 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(0, 0, 0, 0);
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 header.scroll-active {
     background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+header.header-light-merged {
+    background: rgba(250, 250, 250, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+header.header-light-merged .brand,
+header.header-light-merged nav a {
+    color: #141414;
+}
+
+header.header-light-merged .menu-icon span {
+    background: #141414;
 }
 
 .brand {
@@ -388,7 +407,8 @@ footer {
 
 @media (max-width: 768px) {
     header {
-        padding: 15px 20px;
+        height: 50px;
+        padding: 0 16px;
     }
 
     .brand {
